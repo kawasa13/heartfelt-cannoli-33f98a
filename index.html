@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Awareness Security Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--bg:#f4f6fa;--fg:#14202e;--mut:#566476;--line:#d9e0ea;--acc:#2456d6;--ok:#17805a;--bar:#0e1726;--barfg:#e8eef8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--fg:#e8eef8;--mut:#9aa8bc;--line:#243148;--acc:#7aa2ff;--ok:#4cc38a;--bar:#070c16;--barfg:#e8eef8}}
+:root[data-theme="dark"]{--bg:#0b1220;--fg:#e8eef8;--mut:#9aa8bc;--line:#243148;--acc:#7aa2ff;--ok:#4cc38a;--bar:#070c16;--barfg:#e8eef8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.6 "IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+main{max-width:960px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:clamp(1.4rem,4.5vw,2rem);line-height:1.25;margin:0 0 6px;font-weight:600}
+.lead{margin:0 0 18px;color:var(--mut)}
+.stage{position:relative;background:#000;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.frame{position:relative;aspect-ratio:16/9;background:#000}
+.frame video,.frame iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0;display:block}
+.shield{position:absolute;inset:0;z-index:2}
+.big{position:absolute;inset:0;z-index:3;width:100%;display:none;place-items:center;background:rgba(0,0,0,.3);border:0;cursor:pointer}
+.stage.paused .big{display:grid}
+.stage.done .big{display:none}
+.big svg{width:76px;height:76px;padding:20px 17px 20px 23px;border-radius:50%;background:var(--acc);fill:#fff}
+.bar{display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;background:var(--bar);color:var(--barfg);font-size:14px}
+.bar button{background:none;border:0;color:inherit;font:inherit;padding:8px 6px;min-height:44px;cursor:pointer}
+.bar button:focus-visible,.big:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.trk{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden;pointer-events:none}
+.trk i{display:block;height:100%;width:0;background:var(--acc)}
+.tm{font-variant-numeric:tabular-nums;white-space:nowrap}
+.msg{position:absolute;left:50%;top:14px;transform:translate(-50%,-8px);background:#b3261e;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;text-align:center;max-width:90%;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+.msg.on{opacity:1;transform:translate(-50%,0)}
+.note{margin:14px 2px 0;color:var(--mut)}
+.note.ok{color:var(--ok);font-weight:600}
+.stage:fullscreen{border-radius:0;display:flex;flex-direction:column;justify-content:center}
+.stage:fullscreen .frame{aspect-ratio:auto;flex:1;min-height:0}
+@media (prefers-reduced-motion:reduce){.msg{transition:none}}
+
+:root{--btnfg:#fff;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--btnfg:#0b1220;--bad:#ff8a80}}
+:root[data-theme="dark"]{--btnfg:#0b1220;--bad:#ff8a80}
+[hidden]{display:none!important}
+h2{font-size:1.25rem;margin:0 0 12px}
+.stp{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0 0 18px;padding:0;font-size:13px;color:var(--mut)}
+.stp li{padding:4px 12px;border:1px solid var(--line);border-radius:999px}
+.stp li.on{background:var(--acc);border-color:var(--acc);color:var(--btnfg)}
+.btn{margin-top:14px;min-height:46px;padding:0 26px;border:0;border-radius:10px;background:var(--acc);color:var(--btnfg);font-weight:600;font-size:16px;font-family:inherit;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fld{display:block;margin:0 0 14px;font-weight:600}
+.fld input{display:block;width:100%;min-height:46px;margin-top:6px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--fg);font:inherit;font-weight:400}
+.q{margin:0 0 14px;padding:12px 16px;border:1px solid var(--line);border-radius:12px}
+.q.miss{border-color:var(--bad)}
+.q legend{padding:0 6px;font-weight:600}
+.q label{display:flex;gap:10px;align-items:flex-start;min-height:44px;padding:9px 2px;cursor:pointer}
+.q input{flex:none;width:18px;height:18px;margin-top:5px;accent-color:var(--acc)}
+.err{min-height:1.5em;margin:8px 0 0;color:var(--bad)}
+.tm2{margin:0 0 12px;color:var(--mut)}
+.score{margin:4px 0;font-size:2.4rem;font-weight:600}
+.note.bad{color:var(--bad)}
+.btn.ghost{margin:0 0 16px;background:transparent;color:var(--fg);border:1px solid var(--line)}
+.stage.done .trk{pointer-events:auto;cursor:pointer;height:12px}
+.trk:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.msg{z-index:4}
+.nav{display:flex;flex-wrap:wrap;gap:12px}
+.nav .btn.ghost{margin:14px 0 0}
+.stp{font-size:12px}
+@media (max-width:560px){.bar{flex-wrap:wrap;height:auto;padding:6px 12px;row-gap:0}.trk{order:-1;flex:1 0 100%;margin-top:6px}}
+.pf{margin:0 0 12px;padding:12px 16px;border-radius:12px;font-weight:700;font-size:1.2rem;line-height:1.4}
+.pf.ok{color:var(--ok);border:2px solid var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.pf.no{color:var(--bad);border:2px solid var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Awareness Security Training</h1>
+  <ol class="stp" aria-label="ขั้นตอน"><li class="on">1 วิดีโอ 1</li><li>2 วิดีโอ 2</li><li>3 วิดีโอ 3</li><li>4 ข้อมูล</li><li>5 ข้อสอบ</li><li>6 ผลสอบ</li></ol>
+  <div id="vs"></div>
+<section id="s2" hidden>
+  <button id="bv" class="btn ghost" type="button">‹ ย้อนกลับไปดูวิดีโอ</button>
+  <h2>ข้อมูลผู้เข้าสอบ</h2>
+  <form id="f2" novalidate>
+    <label class="fld">ชื่อหน่วยงาน<input id="org" type="text" autocomplete="organization"></label>
+    <label class="fld">ชื่อ-นามสกุล<input id="nm" type="text" autocomplete="name"></label>
+    <p id="e2" class="err" role="alert"></p>
+    <button class="btn" type="submit">เริ่มทำข้อสอบ</button>
+  </form>
+</section>
+<section id="s3" hidden>
+  <button id="bk" class="btn ghost" type="button">‹ ย้อนกลับไปแก้ไขข้อมูล</button>
+  <h2>ข้อสอบ</h2>
+  <p id="tm2" class="tm2">เวลาที่ใช้ 0 นาที 0 วินาที</p>
+  <div id="ex"></div>
+  <p id="e3" class="err" role="alert"></p>
+  <button id="sub" class="btn" type="button">ส่งคำตอบ</button>
+</section>
+<section id="s4" hidden>
+  <h2>ผลสอบ</h2>
+  <p id="pf" class="pf"></p>
+  <p id="sc" class="score"></p>
+  <p id="r2"></p><p id="r3"></p><p id="r4"></p><p id="r5"></p><p id="r6"></p>
+  <p id="sv" class="note"></p>
+  <button id="rt" class="btn" type="button" hidden>ลองส่งผลอีกครั้ง</button>
+  <button id="rx" class="btn" type="button" hidden>‹ สอบใหม่อีกครั้ง</button>
+</section>
+</main>
+<script>
+(()=>{
+const SHEET='https://script.google.com/macros/s/AKfycbweXVfYW-NZUQ7tK8PN3Nirqd7F2LaywT68ThYoDrijYGSzGLnSG_aCBNjf0-gClSM/exec';
+const PTS=5,PASS=45,L=['ก','ข','ค','ง'];
+const A='พื้นที่บริเวณห้องผู้โดยสารขาเข้า',B='พื้นที่บริเวณห้องผู้โดยสารขาออก',C='พื้นที่บริเวณห้องผู้โดยสารขาเข้า,ห้องผู้โดยสารขาออก,พื้นที่คัดแยกและจัดเก็บสัมภาระ,ลานจอดอากาศยาน',D='เข้าได้ทุกพื้นที่ของท่าอากาศยานอุบลราชธานี';
+const Q=[
+['ข้อใดไม่ควรปฏิบัติในเขตพื้นที่การบิน',['ดื่มสุรา','ทิ้งขยะก่อให้เกิดความสกปรก','สูบบุหรี่','ถูกทุกข้อ'],3],
+['พื้นที่เขตการบินเป็นเขตหวงห้าม บุคคลที่เข้าไปจะต้องปฏิบัติอย่างไร',['ติดบัตรอนุญาตบริเวณหน้าอกที่สามารถมองเห็นได้ชัด','แต่งกายด้วยเครื่องแบบบริษัทหรือหน่วยงานของตน','ไม่นำบัตรที่หมดอายุมาใช้','ถูกทุกข้อ'],3],
+['ข้อใดต่อไปนี้ไม่ถูกต้อง',['บัตรอนุญาตชั่วคราวมีอายุไม่เกิน 90 วัน','บัตรอนุญาตถาวรมีอายุไม่เกิน 2 ปี','เขตการบินเป็นเขตหวงห้าม','บัตรอนุญาตบุคคลติดไว้ที่ใดก็ได้'],3],
+['หน่วยงานใดมีหน้าที่รับผิดชอบโดยตรงและดูแลพื้นที่เขตการบิน',['สายการบิน','ท่าอากาศยานอุบลราชธานี','บริษัทวิทยุการบินแห่งประเทศไทย จำกัด','บริษัทตัวแทนให้บริการภาคพื้น'],1],
+['หากพบเห็นวัตถุต้องสงสัยหรือสิ่งของที่ถูกทิ้งไว้โดยไม่มีเจ้าของควรปฏิบัติอย่างไร',['ไม่หยิบจับ สัมผัสสิ่งของ','งดใช้โทรศัพท์ใกล้วัตถุหรือสิ่งของนั้น','แจ้งเจ้าหน้าที่รักษาความปลอดภัย','ถูกทุกข้อ'],3],
+['“บัตรอนุญาตบุคคลชั่วคราว” มีอายุสูงสุดไม่เกินกี่วัน',['ไม่เกิน 90 วัน','ไม่เกิน 60 วัน','ไม่เกิน 30 วัน','ไม่เกิน 7 วัน'],0],
+['“บัตรอนุญาตบุคคลถาวร” มีอายุครั้งละไม่เกินกี่ปี',['ไม่เกิน 1 ปี','ไม่เกิน 2 ปี','ไม่เกิน 3 ปี','ไม่เกิน 4 ปี'],1],
+['มาตรการควบคุมการนำอุปกรณ์เครื่องมือช่าง ของมีคม เข้าไปยังเขตหวงห้ามต้องปฏิบัติอย่างไร',['นำอุปกรณ์เครื่องมือช่าง ของมีคม เข้าพื้นที่ได้เลย','นำอุปกรณ์เครื่องมือช่าง ของมีคม ฝากเจ้าหน้าที่เข้าไป','ลงบันทึกการนำอุปกรณ์เครื่องมือช่าง ของมีคม เข้าเขตหวงห้ามและต้องนำออกมาให้ครบตามที่ระบุไว้','ถูกทุกข้อ'],2],
+['การแบ่งเขตหวงห้ามและพื้นที่ควบคุม หมายเลข 2 หมายถึง ?',[A,B,C,D],1],
+['การแบ่งเขตหวงห้ามและพื้นที่ควบคุม หมายเลข 7 หมายถึง ?',[A,B,C,D],3]];
+
+const VIDS=[{t:'f',src:'video.mp4'},{t:'y',id:'P_YcYteHoVI'},{t:'y',id:'YPvlu5GeVSM'}];
+const $=id=>document.getElementById(id),PAGES=['p0','p1','p2','s2','s3','s4'];
+let who,t0,timer,last,attempt=0,ytOK=false;const ytq=[],ST=[];
+const fmt=s=>Math.floor(s/60)+' นาที '+(s%60)+' วินาที';
+const clock=s=>{s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function stage(i,c,sec){
+ const q=s=>sec.querySelector(s),st=q('.stage'),fr=q('.frame'),sh=q('.shield'),big=q('.big'),msg=q('.msg'),note=q('.note'),nx=q('.nx'),pp=q('.pp'),trk=q('.trk'),fill=q('.trk i'),tm=q('.tm'),mu=q('.mu'),fs=q('.fs'),v=q('video');
+ let A=null,done=false,ended=false,started=false,pos=0,tk=Date.now(),mt;
+ const say=t=>{msg.textContent=t;msg.classList.add('on');clearTimeout(mt);mt=setTimeout(()=>msg.classList.remove('on'),2800)};
+ const fail=t=>{note.textContent=t;note.classList.remove('ok')};
+ const paint=(t,d)=>{const p=d?Math.min(100,t/d*100):0;fill.style.width=p+'%';trk.setAttribute('aria-valuenow',Math.round(p));tm.textContent=clock(t)+' / '+clock(d)};
+ const onPlay=()=>{ended=false;started=true;sh.style.pointerEvents='';big.style.display='';st.classList.remove('paused');pp.textContent='หยุด';if(!done)note.textContent='กำลังเล่น ข้ามหรือเลื่อนไม่ได้จนกว่าจะดูจบ'};
+ const onPause=()=>{if(ended)return;pp.textContent='เล่น';if(!done){st.classList.add('paused');note.textContent='หยุดชั่วคราว'}};
+ const onEnd=()=>{done=ended=true;pp.textContent='เล่น';st.classList.add('done');st.classList.remove('paused');note.textContent='ดูจบแล้ว กดปุ่มถัดไปเพื่อไปต่อ';note.classList.add('ok');nx.disabled=false;trk.tabIndex=0;if(c.t==='y'){A.seek(0);A.pause()}};
+ const tick=()=>{if(!A)return;const t=A.time(),d=A.dur(),now=Date.now(),dt=(now-tk)/1000;tk=now;
+  if(!done){if(t-pos>dt*1.5+1.5){A.seek(pos);say('ข้ามวิดีโอไม่ได้ ระบบพากลับไปจุดเดิมแล้ว')}else pos=t;if(A.rate()!==1)A.setRate(1)}
+  paint(t,d)};
+ setInterval(tick,250);
+ if(c.t==='f'){
+  A={play:()=>{const r=v.play();if(r&&r.catch)r.catch(()=>{})},pause:()=>v.pause(),time:()=>v.currentTime||0,dur:()=>v.duration||0,seek:t=>{v.currentTime=t},playing:()=>!v.paused&&!v.ended,mute:m=>{v.muted=m},muted:()=>v.muted,rate:()=>v.playbackRate,setRate:r=>{v.playbackRate=r}};
+  v.addEventListener('play',onPlay);v.addEventListener('pause',onPause);v.addEventListener('ended',onEnd);
+  v.addEventListener('error',()=>fail('โหลดวิดีโอไม่สำเร็จ ลองรีเฟรชหน้านี้อีกครั้ง'));
+  v.addEventListener('contextmenu',e=>e.preventDefault());
+ }
+ const initYT=()=>{
+  if(c.t!=='y'||fr.querySelector('iframe'))return;
+  const f=document.createElement('iframe');
+  f.src='https://www.youtube.com/embed/'+c.id+'?enablejsapi=1&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&origin='+encodeURIComponent(location.origin);
+  f.allow='autoplay; encrypted-media';f.referrerPolicy='strict-origin-when-cross-origin';f.title='วิดีโอที่ '+(i+1);
+  fr.insertBefore(f,sh);
+  const mk=()=>{const P=new YT.Player(f,{events:{
+   onReady:()=>{A={play:()=>P.playVideo(),pause:()=>P.pauseVideo(),time:()=>P.getCurrentTime()||0,dur:()=>P.getDuration()||0,seek:t=>P.seekTo(t,true),playing:()=>P.getPlayerState()===1,mute:m=>m?P.mute():P.unMute(),muted:()=>P.isMuted(),rate:()=>P.getPlaybackRate(),setRate:r=>P.setPlaybackRate(r)}},
+   onStateChange:e=>{const s=e.data;if(s===1)onPlay();else if(s===2)onPause();else if(s===0){const d=P.getDuration();if(d>5&&P.getCurrentTime()<d-3)return;onEnd()}},
+   onError:e=>fail(e.data===100?'วิดีโอนี้ถูกตั้งเป็นส่วนตัว (Private) หรือถูกลบ เจ้าของต้องเปลี่ยนเป็น Unlisted หรือ Public ใน YouTube Studio':e.data===101||e.data===150?'วิดีโอนี้ไม่อนุญาตให้แสดงบนเว็บอื่น (เจ้าของวิดีโอต้องเปิดอนุญาตการฝังใน YouTube)':'เล่นวิดีโอไม่สำเร็จ (รหัส '+e.data+')')}})};
+  ytOK?mk():ytq.push(mk)};
+ const toggle=()=>{
+  if(!A){say('กำลังโหลดวิดีโอ รอสักครู่');return}
+  if(A.playing()){A.pause();return}
+  A.play();
+  if(c.t==='y'&&!started)setTimeout(()=>{if(!started){sh.style.pointerEvents='none';big.style.display='none';note.textContent='แตะที่ตัววิดีโอเพื่อเริ่มเล่น'}},1800)};
+ pp.onclick=toggle;big.onclick=toggle;sh.onclick=toggle;sh.ondblclick=()=>fs.click();
+ mu.onclick=()=>{if(!A)return;A.mute(!A.muted());mu.textContent=A.muted()?'เปิดเสียง':'ปิดเสียง'};
+ fs.onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else if(st.requestFullscreen)st.requestFullscreen();else if(v&&v.webkitEnterFullscreen)v.webkitEnterFullscreen()};
+ if(!document.fullscreenEnabled&&!(v&&v.webkitEnterFullscreen))fs.hidden=true;
+ trk.onclick=e=>{if(!done||!A)return;const r=trk.getBoundingClientRect();A.seek(Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*(A.dur()||0))};
+ trk.onkeydown=e=>{if(!done||!A)return;if(e.key==='ArrowRight'){A.seek(A.time()+5);e.preventDefault()}else if(e.key==='ArrowLeft'){A.seek(A.time()-5);e.preventDefault()}};
+ return{init:initYT,pause:()=>{if(A&&A.playing())A.pause()},nx,bk:q('.bk'),fail};
+}
+VIDS.forEach((c,i)=>{
+ const sec=document.createElement('section');sec.id='p'+i;sec.hidden=i>0;
+ sec.innerHTML='<p class="lead">วิดีโอที่ '+(i+1)+' จากทั้งหมด '+VIDS.length+' ดูให้ครบตั้งแต่ต้นจนจบ ระบบไม่อนุญาตให้ข้ามหรือกรอไปข้างหน้า</p>'+
+ '<div class="stage paused"><div class="frame">'+(c.t==='f'?'<video src="'+c.src+'" preload="auto" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate"></video>':'')+
+ '<div class="shield"></div><button class="big" aria-label="เล่นวิดีโอ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><div class="msg" role="status"></div></div>'+
+ '<div class="bar"><button class="pp">เล่น</button><div class="trk" role="progressbar" aria-label="ความคืบหน้า" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><span class="tm">0:00 / 0:00</span><button class="mu">ปิดเสียง</button><button class="fs">เต็มจอ</button></div></div>'+
+ '<p class="note">ยังไม่เริ่มดู กดปุ่มเล่นเพื่อเริ่ม</p>'+
+ '<div class="nav">'+(i?'<button class="btn ghost bk" type="button">‹ ย้อนกลับ</button>':'')+'<button class="btn nx" type="button" disabled>'+(i<VIDS.length-1?'ถัดไป: วิดีโอที่ '+(i+2):'ถัดไป: กรอกข้อมูล')+' ›</button></div>';
+ $('vs').appendChild(sec);ST[i]=stage(i,c,sec);
+});
+window.onYouTubeIframeAPIReady=()=>{ytOK=true;ytq.splice(0).forEach(f=>f())};
+if(VIDS.some(c=>c.t==='y')){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>ST.forEach((x,i)=>{if(VIDS[i].t==='y')x.fail('โหลดวิดีโอจาก YouTube ไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรชหน้านี้')});document.head.appendChild(s)}
+const go=n=>{ST.forEach(s=>s.pause());if(document.fullscreenElement)document.exitFullscreen();PAGES.forEach((id,k)=>{$(id).hidden=k!==n});document.querySelectorAll('.stp li').forEach((li,k)=>li.classList.toggle('on',k===n));if(n<VIDS.length)ST[n].init();scrollTo(0,0)};
+ST.forEach((s,i)=>{s.nx.onclick=()=>go(i+1);if(s.bk)s.bk.onclick=()=>go(i-1)});
+document.addEventListener('fullscreenchange',()=>document.querySelectorAll('.fs').forEach(b=>{b.textContent=document.fullscreenElement?'ย่อจอ':'เต็มจอ'}));
+$('bv').onclick=()=>go(2);
+$('ex').innerHTML=Q.map((q,i)=>'<fieldset class="q" id="q'+i+'"><legend>'+(i+1)+'. '+q[0]+'</legend>'+q[1].map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"><span>'+L[j]+'. '+o+'</span></label>').join('')+'</fieldset>').join('');
+$('f2').onsubmit=e=>{e.preventDefault();
+  const o=$('org').value.trim(),n=$('nm').value.trim();
+  if(!o){$('e2').textContent='กรุณากรอกชื่อหน่วยงาน';return}
+  if(!/\S\s+\S/.test(n)){$('e2').textContent='กรุณากรอกชื่อและนามสกุล โดยเว้นวรรคระหว่างกัน';return}
+  who={org:o,name:n};$('e2').textContent='';
+  if(!t0){t0=Date.now();timer=setInterval(()=>{$('tm2').textContent='เวลาที่ใช้ '+fmt(Math.round((Date.now()-t0)/1000))},1000)}
+  go(4)};
+$('bk').onclick=()=>{$('f2').querySelector('button').textContent='กลับไปทำข้อสอบต่อ';go(3)};
+const save=async()=>{const s=$('sv');s.className='note';s.textContent='กำลังส่งผลไปยังตาราง...';$('rt').hidden=true;
+  try{localStorage.setItem('exam_'+Date.now(),JSON.stringify(last))}catch(e){}
+  try{await fetch(SHEET,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(last)});
+    s.textContent='ส่งผลไปยังตารางแล้ว ✓';s.className='note ok'}
+  catch(e){s.textContent='ส่งผลไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วกดลองอีกครั้ง';s.className='note bad';$('rt').hidden=false}};
+$('rt').onclick=save;
+$('rx').onclick=()=>{document.querySelectorAll('#ex input:checked').forEach(i=>{i.checked=false});document.querySelectorAll('#ex .q').forEach(q=>q.classList.remove('miss'));$('e3').textContent='';clearInterval(timer);t0=Date.now();$('tm2').textContent='เวลาที่ใช้ 0 นาที 0 วินาที';timer=setInterval(()=>{$('tm2').textContent='เวลาที่ใช้ '+fmt(Math.round((Date.now()-t0)/1000))},1000);go(4)};
+$('sub').onclick=()=>{
+  const a=Q.map((q,i)=>{const c=document.querySelector('input[name=q'+i+']:checked');return c?+c.value:-1});
+  a.forEach((x,i)=>$('q'+i).classList.toggle('miss',x<0));
+  const m=a.indexOf(-1);
+  if(m>=0){$('e3').textContent='ยังไม่ได้ตอบข้อ '+(m+1);$('q'+m).scrollIntoView({block:'center'});return}
+  clearInterval(timer);$('e3').textContent='';
+  const sec=Math.round((Date.now()-t0)/1000),ok=a.filter((x,i)=>x===Q[i][2]).length,wrong=a.map((x,i)=>x===Q[i][2]?0:i+1).filter(Boolean);
+  attempt++;const score=ok*PTS,pass=score>=PASS;
+  last={org:who.org,name:who.name,score:score,total:Q.length*PTS,percent:Math.round(ok/Q.length*100),seconds:sec,duration:fmt(sec),answers:'ครั้งที่ '+attempt+' ('+(pass?'ผ่าน':'ไม่ผ่าน')+') '+a.map((x,i)=>(i+1)+':'+L[x]+(x===Q[i][2]?'✓':'✗')).join(', ')};
+  $('sc').textContent='คะแนน '+last.score+' / '+last.total;
+  $('r2').textContent='ตอบถูก '+ok+' จาก '+Q.length+' ข้อ ('+last.percent+'%)';
+  $('r3').textContent='เวลาที่ใช้ '+last.duration;
+  $('r4').textContent=who.name+' / '+who.org;
+  $('r5').textContent=wrong.length?'ข้อที่ตอบผิด: '+wrong.join(', '):'ตอบถูกทุกข้อ';
+  const pf=$('pf');pf.className='pf '+(pass?'ok':'no');pf.textContent=pass?'✓ คุณผ่านการทดสอบแล้ว':'ไม่ผ่านการทดสอบ กรุณาสอบใหม่อีกครั้ง';$('rx').hidden=pass;$('r6').textContent='เกณฑ์ผ่าน '+PASS+' คะแนนขึ้นไป (เต็ม '+last.total+')';
+  go(5);save()};
+
+})();
+</script>
+</body>
+</html>
